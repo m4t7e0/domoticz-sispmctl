@@ -1,0 +1,28 @@
+#
+# Domoticz sispmctl PowerStrip 
+#
+# https://github.com/m4t7e0/domoticz-sispmctl
+#
+
+# Pull base image.
+FROM debian
+MAINTAINER m4t7e0
+
+# Install necessary Curl and sispmtl
+RUN \
+  apt-get update && \
+  apt-get install -y curl sispmctl
+
+# Define working directory.
+WORKDIR /tmp/
+
+# Download the script--- Update IT with your own proberties
+RUN wget https://github.com/m4t7e0/domoticz-sispmctl/blob/master/domoticz-powerstrip.sh
+
+# Loadin the script and set the cron job every minutes
+RUN \
+  cp domoticz-powerstrip.sh /sbin/usr/ && \
+  chmod +x  /sbin/usr/domoticz-powerstrip.sh && \
+  (crontab -l 2>/dev/null; echo "  * * * * *  /usr/sbin/domoticz-powerstrip.sh") | crontab -update-rc.d domoticz defaults
+
+CMD ["/usr/sbin/domoticz-powerstrip.sh"]
